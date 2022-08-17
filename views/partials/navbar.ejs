@@ -1,0 +1,81 @@
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/91abd10b8f.js" crossorigin="anonymous"></script>
+
+    <header class="header-area header-sticky">
+      <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a href="/" class="logo navbar-brand mt-2"><img src="/images/logo.png"> </a> 
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarScroll">
+        <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+          <li class="nav-item">
+            <a href="/" class="nav-link active">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/product">Products</a>
+          </li>
+         
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Categories
+            </a>
+            <ul class="dropdown-menu">
+                <% for(let cat of cats) {%>
+                <li class="dropdown-item"> <a class="dropdown-item" href="/product/category/<%= cat._id %>"><%= cat.category %> </a></li>
+                <% } %> 
+                <li><hr class="dropdown-divider"></li>
+            </ul>
+        </li>
+
+        
+           <% if(currentUser){ %>
+        <li  class="nav-item dropdown  ">
+            <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user"> </i>Welcome  <%= currentUser.username %>
+            </a>
+            <ul class="dropdown-menu">
+                <li class=""> <a class="dropdown-item" href="/user/profile">User Account</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="dropdown-item"> <a class="dropdown-item" href="/logout">Log out</a></li>
+                <% if(product.admin.equals(currentUser._id)){ %> 
+                <li class="dropdown-item"> <a href="/admin" class=" dropdown-item px-4 btn-outline-light p-auto">Admin</a></li> 
+                <% } %> 
+            </ul>
+        </li>
+          <% }else{ %> 
+          <li class="nav-item dropdown ml-3">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-user"> </i>Account %>
+                </a>    
+            <ul class="dropdown-menu">
+                <li class=""><a class="dropdown-item"  href="/register?returnTo=<%= url %>">Sign Up</a></li>
+                <li class="dropdown-item"><a class=" dropdown-item px-4 btn-outline-dark"  href="/login?returnTo=<%= url %>">Log in</a></li>
+                <li><hr class="dropdown-divider"></li>
+              </ul>
+            </li> 
+            <% } %> 
+        
+          
+        <li class="ml-3 mt-2">
+            <a class="dropdown-item" href="/shoppingCart">
+                <i class="fas fa-shopping-cart"></i><% if(session.cart) { %>
+              <span class="badge badge-pill badge-dark"
+                ><%= session.cart.totalQty %></span
+              >
+              <% } else { %>
+              <span class="badge badge-pill badge-dark">0</span>
+              <% } %>
+            </a>
+          </li>
+        </ul>
+        <form action="/admin/search" method="get"  class="d-flex" role="search">
+          <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-dark" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+</header>
