@@ -66,12 +66,12 @@ module.exports.getShoppingCart = async (req,res) => {
         for(let p of cool){
         if(req.user && cartUser){
             req.session.cart = cartUser;
-            return res.render('categories/shoppingCart',{cart:cartUser,products: await productsFromCart(cartUser),product:p,cats,url:req.originalUrl});
+            return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:cartUser,products: await productsFromCart(cartUser),product:p,cats,url:req.originalUrl});
         }
         if(!req.session.cart){
-            return res.render('categories/shoppingCart',{cart:null,cats,products :null,url:req.originalUrl,product:p})
+            return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:null,cats,products :null,url:req.originalUrl,product:p})
         }
-        return res.render('categories/shoppingCart',{cart:req.session.cart,products: await productsFromCart(req.session.cart),product:p,url:req.originalUrl});
+        return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:req.session.cart,products: await productsFromCart(req.session.cart),product:p,url:req.originalUrl});
     }} catch (error) {
         console.log(error.message);
         console.log(error.stack);
@@ -158,7 +158,7 @@ module.exports.checkout = async (req,res) => {
         res.redirect('/shoppingCart')
     }
     cart = await Cart.findById(req.session._id);
-    res.render('categories/checkout',{cats,cart,product:p})
+    res.render('categories/checkout',{cats,cart,product:p,pagename:'Glamoreux | Checkout'})
 }}
 
 const  productsFromCart = async (cart) => {

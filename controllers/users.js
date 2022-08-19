@@ -1,5 +1,4 @@
 const User = require('../models/user');
-const cool = require('../utils/email');
 const Token = require('../models/token');
 const nodemailer = require('nodemailer');
 const {google} = require('googleapis')

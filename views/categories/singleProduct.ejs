@@ -1,10 +1,11 @@
 <% layout('layout/boilerplate') -%> 
+<link rel="stylesheet" href="/starCss/starability.basic.css">
  <div class="page-heading" id="top">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="inner-content">
-                    <h2><%= product.name  %> </h2>
+                    <h2><%= product.category.category  %> </h2>
                     <span>Awesome &amp; Creative HTML CSS layout by TemplateMo</span>
                 </div>
             </div>
@@ -27,14 +28,14 @@
         <div class="col-lg-6">
             <div class="right-content">
                 <h4><%= product.name %></h4>
-                <ul class="stars">
+                <ul class=" d-flex flex-row my-2">
                     <li><i class="fa fa-star"></i></li>
                     <li><i class="fa fa-star"></i></li>
                     <li><i class="fa fa-star"></i></li>
                     <li><i class="fa fa-star"></i></li>
                     <li><i class="fa fa-star"></i></li>
                 </ul>
-                <span><%= product.description %> </span>
+                <span class="my-3"><%= product.description %> </span>
                 
                 <div class="total">
                     <h4>Price:$<%= product.price %> </h4>
@@ -78,10 +79,12 @@
         </div>  
         </div>
         <div>
-            <h1>Reviews</h1>
+            <h5>Buyers Feedback</h5>
             <% for(let review of product.reviews){%> 
-            <div class="quote">
-                <i class="fa fa-quote-left"></i><p><%= review.message %> </p>
+            <div class="quote my-3">
+                <h5 class="card-title"> <%= currentUser.username%></h5>
+                <h3 class="starability-result" data-rating="<%=review.rating%>"> Rated:<%=review.rating%> stars</h3>
+                <i class="fa fa-quote-left"> <p class="d-inline"><%=review.message%></p></i>
             </div>
             <% } %> 
         </div>

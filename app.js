@@ -19,6 +19,7 @@ const methodOverride = require('method-override');
 const AppError = require('./utils/AppError');
 const User = require('./models/user');
 const MongoStore = require('connect-mongo');
+const catchAsync = require('./utils/catchAsync')
 
 
 const app = express();
@@ -94,10 +95,22 @@ app.get('/', async (req,res) => {
   const cats = await Category.find({}).populate('products');
   const products = await Product.find({});
   for(let p of products){
-     return res.render('home',{cats,url:req.originalUrl,product:p})
+     return res.render('home',{pagename:'Glamoreux',cats,url:req.originalUrl,product:p})
   }
 })
 
+app.get('/search',catchAsync( async(req,res)=> {
+  const cats = await Category.find({})
+  const page = parseInt(req.query.page)
+  const products = await Product.find(
+      {$or:[
+          {name:{'$regex':req.query.search}},
+          {description:{'$regex':req.query.search}}
+       ]})
+       for(let p of products){
+         return  res.render('categories/product',{pagename:'Products',products,product:p,cats,pages: null,home: `/product/?`,current: page,url:req.originalUrl})  
+         }  
+}))
 
 app.use('/product',productRoute);
 app.use('/admin',adminRoute);
@@ -105,6 +118,33 @@ app.use(usersRoute);
 app.use(cartRoute);
 app.use('/product/:id/reviews',reviewRoute);
 
+// app.get("/search", async (req, res) => {
+//   const cats = await Category.find({});
+//   const perPage = 8;
+//   let page = parseInt(req.query.page);
+//   try {
+//     const products = await Product.find(
+//       {$or:[
+//       {name: { $regex: req.query.search, $options: "i" }},
+//       {description: { $regex: req.query.search, $options: "i" }}
+//     ]})
+//      .sort("-createdAt")
+//       .skip(perPage * page - perPage)
+//       .limit(perPage)
+//       .populate("category")
+//     const count = await Product.find(
+//       {$or:[
+//       {name: { $regex: req.query.search, $options: "i" }},
+//       {description: { $regex: req.query.search, $options: "i" }}
+//     ]})
+//     for(let p of products){
+//       return  res.render('categories/product',{pagename:'Products',products,product:p,cats,pages: Math.ceil(count / perPage),home: `/product/?`,current: page,url:req.originalUrl})  
+// }  
+//   } catch (error) {
+//     console.log(error.message,error.stack);
+//     res.redirect("/");
+//   }
+// });
 
 app.all('*', (req,res,next) => {
   const error = new AppError(400,'Page Not Found');

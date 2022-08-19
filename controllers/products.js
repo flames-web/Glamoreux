@@ -10,15 +10,15 @@ module.exports.renderProducts  = async (req,res) => {
     const count = await Product.count();
     const cools = await Product.find({});
     for(let p of products){
-        return res.render('categories/product',{products,cats,product:p,pages: Math.ceil(count / perPage),home: "/product/?",current: page,url:req.originalUrl})
+        return res.render('categories/product',{pagename:'Glamoreux | Products',products,cats,product:p,pages: Math.ceil(count / perPage),home: "/product/?",current: page,url:req.originalUrl})
    }
 }
 
 module.exports.renderSingleProduct = async (req,res) => {
     const {id} = req.params;
-    const product = await Product.findById(id).populate('reviews')
+    const product = await Product.findById(id).populate('reviews').populate('category')
     const cats = await Category.find({});
-    res.render('categories/singleProduct',{product,cats,url:req.originalUrl})
+    res.render('categories/singleProduct',{product,pagename:`Glamoreux | ${product.name}`,cats,url:req.originalUrl})
 }
 
 module.exports.renderSingleCat = async (req,res) => {
@@ -27,8 +27,9 @@ module.exports.renderSingleCat = async (req,res) => {
     let page = parseInt(req.query.page) || 1;
     const products = await Product.find({category:name}).sort("-createdAt").skip(perPage * page - perPage).limit(perPage)
     const cats = await Category.find({}).populate('products')
+    const cat = await Category.findById({_id:name});
     const count = await Product.count();
     for(let p of products){
-            return  res.render('categories/product',{products,product:p,cats,pages: Math.ceil(count / perPage),home: `/product/category/${name}/?`,current: page,url:req.originalUrl})  
+            return  res.render('categories/product',{pagename:`Glamoreux | ${cat.category}`,products,product:p,cats,pages: Math.ceil(count / perPage),home: `/product/category/${name}/?`,current: page,url:req.originalUrl})  
       }
 }
