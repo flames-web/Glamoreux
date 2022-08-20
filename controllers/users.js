@@ -5,11 +5,11 @@ const {google} = require('googleapis')
 
 module.exports.getAccounts = async (req,res) => {
     const users = await User.find({});
-    res.render('admin/account',{users});
+    res.render('admin/account',{pagename:'Accounts',users});
 }
 
 module.exports.renderRegister = (req,res) => {
-    res.render('users/register')
+    res.render('users/register',{pagename:'Register'});
 }
 
 module.exports.register =  async (req,res,next) => {
@@ -77,7 +77,7 @@ module.exports.register =  async (req,res,next) => {
     if (req.query.returnTo) {
         req.session.returnTo = req.query.returnTo;
     }
-    res.render('users/login')
+    res.render('users/login',{pagename:'Login'})
 }
 
 module.exports.login = (req,res) => {

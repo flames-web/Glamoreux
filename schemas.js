@@ -14,3 +14,8 @@ module.exports.categorySchema = Joi.object({
     category:Joi.string().required(),
     catDescription:Joi.string()
 })
+
+module.exports.reviewSchema = Joi.object({
+    message:Joi.string().required(),
+    rating:Joi.number()
+})

@@ -5,14 +5,14 @@ const {cloudinary} = require('../cloudinary');
 
 module.exports.index = async (req,res) => {
     const products = await Product.find({});  
-    res.render('admin/index',{products});
+    res.render('admin/index',{products,pagename:'Admin'});
 }
 
 module.exports.contact = async (req,res) => {
     const cats = await Category.find({}).populate('products');
     const products = await Product.find({});
     for(let p of products){
-        return res.render('categories/contact',{cats,url:req.originalUrl,product:p});
+        return res.render('categories/contact',{pagename:'Contact',cats,url:req.originalUrl,product:p});
       }  
 }
 
@@ -20,7 +20,7 @@ module.exports.about = async (req,res) => {
     const cats = await Category.find({}).populate('products');
     const products = await Product.find({});
     for(let p of products){
-        return res.render('categories/about',{cats,url:req.originalUrl,product:p});
+        return res.render('categories/about',{pagename:'About',cats,url:req.originalUrl,product:p});
       }
 }
 
@@ -30,12 +30,12 @@ module.exports.products =  async (req,res) => {
     let page = parseInt(req.query.page) || 1;
     const products = await Product.find({}).sort("-createdAt").skip(perPage * page - perPage).limit(perPage)
     const count = await Product.count();
-    res.render('admin/products',{cats,products,pages: Math.ceil(count / perPage),home: "/admin/products/?",current: page,title:'All'})
+    res.render('admin/products',{pagename:'Products',cats,products,pages: Math.ceil(count / perPage),home: "/admin/products/?",current: page,title:'All'})
 }
 
 module.exports.newProduct =  async (req,res) => {
     const cats = await Category.find({});
-    res.render('admin/addProduct',{cats});
+    res.render('admin/addProduct',{pagename:'Product',cats});
 }
 
 module.exports.createProduct =  async (req,res) => {
@@ -71,7 +71,7 @@ module.exports.deleteProduct = async (req,res) => {
 module.exports.renderEditProduct = async (req,res) => {
     const {id} = req.params;
     const product = await Product.findById(id);
-    res.render('admin/editProduct',{product});
+    res.render('admin/editProduct',{pagename:'Edit Product',product});
 }
 
 module.exports.updateProducts =  async (req,res) => {
@@ -91,13 +91,17 @@ module.exports.updateProducts =  async (req,res) => {
 }
 
 module.exports.newCategory =  async (req,res) => {
-    res.render('admin/addCategory')
+    res.render('admin/addCategory',{pagename:'New Category'})
 }
 
 module.exports.createCategory = async (req,res) => {
     const cat = new Category(req.body);
     await cat.save();
     res.redirect('/admin/products');
+}
+
+module.exports.getCategory = async (req,res) => {
+    res.render('admin/products',{pagename:'Pro'});
 }
 
 module.exports.showCategory =  async (req,res) => {
@@ -110,5 +114,15 @@ module.exports.showCategory =  async (req,res) => {
     const count = await Product.count();
     const pages = Math.ceil(count / perPage);
     const title = cat[0].category;
-    res.render('admin/products',{cats,products,pages,home: `/admin/category/${name}/?`,current: page,title,url:req.originalUrl});
+    res.render('admin/products',{cats,products,pages,home: `/admin/category/${name}/?`,current: page,title,url:req.originalUrl,pagename:`${cat.category}`});
+}
+
+module.exports.deleteCategory =  async (req,res) => {
+    if(req.body.cool){
+    const deleted  = await Category.deleteMany({_id :req.body.cool });
+    const product = await Product.deleteMany({category:req.body.cool});
+        console.log(product)
+        req.flash('error','sucessfully deleted a new category')
+    }
+    res.redirect('/admin/products')
 }

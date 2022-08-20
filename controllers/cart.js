@@ -55,6 +55,7 @@ module.exports.getAddcart = async (req,res) => {
 
 module.exports.getShoppingCart = async (req,res) => {
     const cats = await Category.find({});
+    const cools = await Product.find({});
     let products;
     try {
         let cartUser;
@@ -66,12 +67,12 @@ module.exports.getShoppingCart = async (req,res) => {
         for(let p of cool){
         if(req.user && cartUser){
             req.session.cart = cartUser;
-            return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:cartUser,products: await productsFromCart(cartUser),product:p,cats,url:req.originalUrl});
+            return res.render('categories/shoppingCart',{cools,pagename:`Glamoreux | Shopping Cart`,cart:cartUser,products: await productsFromCart(cartUser),product:p,cats,url:req.originalUrl});
         }
         if(!req.session.cart){
-            return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:null,cats,products :null,url:req.originalUrl,product:p})
+            return res.render('categories/shoppingCart',{cools,pagename:`Glamoreux | Shopping Cart`,cart:null,cats,products :null,url:req.originalUrl,product:p})
         }
-        return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:req.session.cart,products: await productsFromCart(req.session.cart),product:p,url:req.originalUrl});
+        return res.render('categories/shoppingCart',{cools,pagename:`Glamoreux | Shopping Cart`,cart:req.session.cart,products: await productsFromCart(req.session.cart),product:p,url:req.originalUrl});
     }} catch (error) {
         console.log(error.message);
         console.log(error.stack);

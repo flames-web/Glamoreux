@@ -34,17 +34,12 @@ router.get('/products/:id/edit',isLoggedIn,isAdmin,catchAsync(admin.renderEditPr
 
 router.get('/category/new',isLoggedIn,isAdmin,catchAsync(admin.newCategory))
 
+// router.get('/category',catchAsync(admin.getCategory));
+
 router.post('/category',isLoggedIn,isAdmin,validateCategory,catchAsync(admin.createCategory))
 
 router.get('/category/:name',isLoggedIn,isAdmin,catchAsync(admin.showCategory))
 
-router.delete('/category',  async (req,res) => {
-    if(req.body.cool){
-    const deleted  = await Category.deleteMany({_id :req.body.cool });
-        console.log(deleted)
-        req.flash('error','sucessfully deleted a new category')
-    }
-    res.redirect('/admin/products')
-})
+router.delete('/category',isLoggedIn,isAdmin,catchAsync(admin.deleteCategory))
 
 module.exports = router;
