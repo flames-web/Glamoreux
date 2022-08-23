@@ -8,6 +8,7 @@ const cookiePasser = require('cookie-parser')
 const passport = require('passport');
 const passportLocal = require('passport-local');
 const flash = require('connect-flash');
+const stripe = require('stripe')(process.env.PUBLISHABLE_KEY);
 const Product = require('./models/product');
 const Category = require('./models/category');
 const productRoute = require('./routes/product');

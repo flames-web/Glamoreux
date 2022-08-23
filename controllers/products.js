@@ -29,7 +29,5 @@ module.exports.renderSingleCat = async (req,res) => {
     const cats = await Category.find({}).populate('products')
     const cat = await Category.findById({_id:name});
     const count = await Product.count();
-    for(let p of products){
-            return  res.render('categories/product',{pagename:`Glamoreux | ${cat.category}`,products,product:p,cats,pages: Math.ceil(count / perPage),home: `/product/category/${name}/?`,current: page,url:req.originalUrl})  
-      }
+    return  res.render('categories/product',{pagename:`Glamoreux | ${cat.category}`,products,cats,pages: Math.ceil(count / perPage),home: `/product/category/${name}/?`,current: page,url:req.originalUrl})  
 }
