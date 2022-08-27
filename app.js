@@ -1,34 +1,45 @@
-require('dotenv').config();
+if(process.env.NODE_ENV !== 'production'){
+  require('dotenv').config();
+}
 const express = require('express');
-const ejsMate = require('ejs-mate');
+const app = express();
 const path = require('path');
+const ejsMate = require('ejs-mate');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const cookiePasser = require('cookie-parser')
 const passport = require('passport');
 const passportLocal = require('passport-local');
 const flash = require('connect-flash');
-const stripe = require('stripe')(process.env.PUBLISHABLE_KEY);
+const stripe = require('stripe')(process.env.SECRET_KEY);
+const methodOverride = require('method-override');
+const MongoStore = require('connect-mongo');
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+
 const Product = require('./models/product');
 const Category = require('./models/category');
+const User = require('./models/user');
+
+const AppError = require('./utils/AppError');
+const catchAsync = require('./utils/catchAsync');
+
 const productRoute = require('./routes/product');
 const adminRoute = require('./routes/admin');
 const usersRoute = require('./routes/users');
 const reviewRoute = require('./routes/review');
-const cartRoute = require('./routes/cart')
-const methodOverride = require('method-override');
-const AppError = require('./utils/AppError');
-const User = require('./models/user');
-const MongoStore = require('connect-mongo');
-const catchAsync = require('./utils/catchAsync')
+const cartRoute = require('./routes/cart');
+const resetRoute = require('./routes/passwordReset');
 
-
-const app = express();
 
 app.engine('ejs',ejsMate);
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.static(path.join(__dirname,'public')));
+app.use(methodOverride('_method'));
+app.use(mongoSanitize({
+  replaceWith: '_'
+}))
 
 app.set('view engine','ejs')
 app.set('views',path.join(__dirname,'views'));
@@ -42,9 +53,6 @@ db.once('open', () => {
   console.log('Database Opened');
 })
 
-
-app.use(express.urlencoded({extended : true}));
-app.use(methodOverride('_method'));
 
 app.use(cookiePasser());
 const secret = process.env.SECRET;
@@ -79,6 +87,55 @@ passport.use(new passportLocal(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.use(helmet());
+
+app.use(helmet.crossOriginEmbedderPolicy({ policy: "credentialless" }));
+
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com",
+    "https://kit-free.fontawesome.com",
+    "https://cdn.jsdelivr.net",
+    "https://kit.fontawesome.com",
+    "https://ka-f.fontawesome.com",
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com",
+    "https://stackpath.bootstrapcdn.com",
+    "https://fonts.googleapis.com",
+    "https://cdn.jsdelivr.net",
+    "https://ka-f.fontawesome.com"
+];
+const connectSrcUrls = [
+  "https://fonts.gstatic.com",
+  "https://cdn.linearicons.com",
+];
+const fontSrcUrls = [
+ 
+];
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            childSrc: ["blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/dcz8fqwkr/", 
+                "https://images.unsplash.com",
+                "https://cdn.pixabay.com/",
+                "https://images.pexels.com",
+                "https://live.staticflickr.com",
+                "https://storage.needpix.com",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })),
 
 app.use(flash());
 app.use((req,res,next) => {
@@ -106,6 +163,7 @@ app.use('/admin',adminRoute);
 app.use(usersRoute);
 app.use(cartRoute);
 app.use('/product/:id/reviews',reviewRoute);
+app.use('/',resetRoute);
 
 app.get("/search", async (req, res) => {
   const cats = await Category.find({});
@@ -128,7 +186,8 @@ app.get("/search", async (req, res) => {
       {description: { $regex: req.query.search, $options: "i" }}
     ]})
    
-      return  res.render('categories/product',{pagename:'Products',products,cools,cats,pages: Math.ceil(count / perPage),home: `/product/?`,current: page,url:req.originalUrl})  
+      return  res.render('categories/product',{pagename:'Products',products,cools,cats,
+          pages: Math.ceil(count / perPage),home: `/product/?`,current: page,url:req.originalUrl})  
 
   } catch (error) {
     console.log(error.message,error.stack);
@@ -149,4 +208,5 @@ app.use((err,req,res,next) => {
 
 app.listen(3000, () => {
     console.log('Listening at port 3000');
+    console.log(process.env.NODE_ENV)
 }) 

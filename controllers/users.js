@@ -47,9 +47,9 @@ module.exports.register =  async (req,res,next) => {
         });
     
         const mailOptions = {
-          from: 'Yelp Camp <yours authorised email rajiolalekanh247@gmail.com>',
+          from: 'Glamoreux <yours authorised email rajiolalekanh247@gmail.com>',
           to: email,
-          subject: 'Welcome to Yelp Camp',
+          subject: 'Welcome to Glamoreux',
           text:'Jump right in and explore our many campgrounds. Feel free to share some of your own and comment on others',
           html:'<h1>Jump right in and explore our many campgrounds. Feel free to share some of your own and comment on others</h1>',
         }

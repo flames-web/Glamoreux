@@ -11,7 +11,4 @@ router.get('/category/:name', catchAsync(products.renderSingleCat))
 
 router.get('/:id',catchAsync(products.renderSingleProduct));
 
-
-
-
 module.exports = router;

@@ -9,12 +9,17 @@ const {isLoggedIn,validateProduct,validateCategory,isAdmin} = require('../middle
 const multer = require('multer');
 const { storage } = require('../cloudinary');
 const upload = multer({ storage });
+const nodemailer = require('nodemailer');
+const {google} = require('googleapis')
 
 
 router.get('/',isLoggedIn,isAdmin,catchAsync(admin.index));
 
-router.get('/contact',catchAsync(admin.contact))
+router.route('/contact')
+   .get(catchAsync(admin.contact))
+   .post(catchAsync(admin.postContact))
 
+      
 router.get('/about', catchAsync(admin.about))
  
 router.route('/products')
@@ -34,7 +39,7 @@ router.get('/products/:id/edit',isLoggedIn,isAdmin,catchAsync(admin.renderEditPr
 
 router.get('/category/new',isLoggedIn,isAdmin,catchAsync(admin.newCategory))
 
-// router.get('/category',catchAsync(admin.getCategory));
+router.get('/category',catchAsync(admin.getCategory));
 
 router.post('/category',isLoggedIn,isAdmin,validateCategory,catchAsync(admin.createCategory))
 
