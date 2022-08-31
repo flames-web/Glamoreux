@@ -1,6 +1,8 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
 const {cloudinary} = require('../cloudinary');
+const nodemailer = require('nodemailer');
+const {google} = require('googleapis')
 
 
 module.exports.index = async (req,res) => {
@@ -11,9 +13,7 @@ module.exports.index = async (req,res) => {
 module.exports.contact = async (req,res) => {
     const cats = await Category.find({}).populate('products');
     const products = await Product.find({});
-    for(let p of products){
-        return res.render('categories/contact',{pagename:'Contact',cats,url:req.originalUrl,product:p});
-      }  
+    return res.render('categories/contact',{pagename:'Contact',cats,url:req.originalUrl});  
 }
 
 module.exports.postContact = async (req,res ) => {
@@ -35,12 +35,12 @@ module.exports.postContact = async (req,res ) => {
     async function sendMail() {
         try {
           const accessToken = await oAuth2Client.getAccessToken();
-      
+      console.log(accessToken);
           const transport = nodemailer.createTransport({
             service: 'gmail',
             auth: {
               type: 'OAuth2',
-              user: 'rajiolalekanh247@gmail.com',
+              user: 'glamoreux0@gmail.com',
               clientId: CLIENT_ID,
               clientSecret: CLEINT_SECRET,
               refreshToken: REFRESH_TOKEN,
@@ -49,8 +49,8 @@ module.exports.postContact = async (req,res ) => {
          });
 
     const mailOptions = {
-        from: email,
-        to:'rajiolalekanh247@gmail.com',
+        from: 'glamoreux0@gmail.com',
+        to:'dexnis30@gmail.com',
         subject: name,
         text:message,
         html:`<h1>${message}</h1>`,

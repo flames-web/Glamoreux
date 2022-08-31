@@ -72,7 +72,7 @@ module.exports.postReset = async (req,res) => {
   .then((result) => console.log('Email sent...', result,))
   .catch((error) => console.log(error.message))
   req.flash('success','email sent sucessfully')
-  res.redirect('/reset');
+  res.render('categories/email');
 }
 
 module.exports.getToken = async (req,res) => {

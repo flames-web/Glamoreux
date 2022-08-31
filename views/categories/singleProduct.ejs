@@ -77,16 +77,28 @@
                   </form>
             </div>
         </div>  
-        </div>
-        <div>
-            <!-- <h5>Buyers Feedback</h5>
+        </div>]
+        <h5 class="my-5">Buyers Feedback</h5>
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+           
             <% for(let review of product.reviews){%> 
-            <div class="quote my-3">
-                <h5 class="card-title"> <%= currentUser.username%></h5>
-                <h3 class="starability-result" data-rating="<%=review.rating%>"> Rated:<%=review.rating%> stars</h3>
-                <i class="fa fa-quote-left"> <p class="d-inline"><%=review.message%></p></i>
+
+             <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                        <%= currentUser.username%>
+                      </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+                      <div class="accordion-body">
+                      <p class="starability-result d-block" data-rating="<%=review.rating%>"><%=review.rating%> </p> 
+                      <br>
+                      <%=review.message%>                         
+                      </div>
+                    </div>
+                  </div>
+            <% } %>            
             </div>
-            <% } %>  -->
         </div>
     </div>
 </section>
