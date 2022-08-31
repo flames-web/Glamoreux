@@ -38,7 +38,7 @@ module.exports.register =  async (req,res,next) => {
           service: 'gmail',
           auth: {
             type: 'OAuth2',
-            user: 'rajiolalekanh247@gmail.com',
+            user: 'glamoreoux0@gmail.com',
             clientId: CLIENT_ID,
             clientSecret: CLEINT_SECRET,
             refreshToken: REFRESH_TOKEN,
@@ -50,8 +50,8 @@ module.exports.register =  async (req,res,next) => {
           from: 'Glamoreux <yours authorised email rajiolalekanh247@gmail.com>',
           to: email,
           subject: 'Welcome to Glamoreux',
-          text:'Jump right in and explore our many campgrounds. Feel free to share some of your own and comment on others',
-          html:'<h1>Jump right in and explore our many campgrounds. Feel free to share some of your own and comment on others</h1>',
+          text:'Jump right in and explore our many products. Feel free to share your reviews on our products',
+          html:'<h1>Jump right in and explore our many products. Feel free to share your reviews on our products</h1>',
         }
         const result = await transport.sendMail(mailOptions);
         return result;

@@ -44,7 +44,8 @@ app.use(mongoSanitize({
 app.set('view engine','ejs')
 app.set('views',path.join(__dirname,'views'));
 
-const dbUrl = 'mongodb://localhost:27017/commerce'
+const dbUrl = process.env.DB_URL;
+const host = 'mongodb://localhost:27017/commerce'
 mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
