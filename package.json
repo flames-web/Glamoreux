@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "seed": "node seedDb/index.js",
-    "start": "node app.js",
-    "pm2":"pm2 start app.js -i max",
+    "start": "node app.js && pm2 start app.js -i max",
+    "pm2":"",
     "watch": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
