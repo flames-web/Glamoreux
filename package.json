@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "seed": "node seedDb/index.js",
+    "start": "pm2 start api.js -i max",
     "watch": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
