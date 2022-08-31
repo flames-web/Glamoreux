@@ -45,7 +45,7 @@ app.set('view engine','ejs')
 app.set('views',path.join(__dirname,'views'));
 
 const dbUrl = process.env.DB_URL;
-const host = 'mongodb://localhost:27017/commerce'
+// const host = 'mongodb://localhost:27017/commerce'
 mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
@@ -209,5 +209,5 @@ app.use((err,req,res,next) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log('Listening at port 3000');
+    console.log(`Listening at port ${port}`);
 }) 
