@@ -1,10 +1,13 @@
 const Cart = require('../models/cart');
 const Product = require('../models/product');
 const Category = require('../models/category');
+const request = require('request');
+const _ = require('lodash');
+const {initializePayment,veriryPayment} = require('../utils/payment')(request);
 
 module.exports.getAddcart = async (req,res) => {
-    const {id} = req.params;
     try {
+        const {id} = req.params;
         let userCart;
         if(req.user){
             userCart = await Cart.findOne({user:req.user._id});
@@ -17,19 +20,17 @@ module.exports.getAddcart = async (req,res) => {
             return res.redirect(`/login?returnTo=/product/${id}`);
         }else {
             cart = userCart;
-            console.log(cart);
         }
-
         const product = await Product.findById(id);
         const itemIndex = cart.items.findIndex((p)=> p.productId == id);
         if(itemIndex > -1){
             cart.items[itemIndex].qty++;
             cart.items[itemIndex].price = cart.items[itemIndex].qty * product.price;
             cart.totalQty++;
-            cart.totalCost += product.price;
+             cart.totalCost += product.price;
         }else {
             cart.items.push({
-                productId: id,
+                productId: product._id,
                 name:product.name,
                 qty:1,
                 price:product.price,
@@ -42,40 +43,34 @@ module.exports.getAddcart = async (req,res) => {
             cart.user = req.user._id;
             await cart.save();
         }
-
         req.session.cart = cart;
         req.flash('success','Item added to the shopping cart');
-        console.log(req.session)
-        res.redirect(req.headers.referer)
+        console.log(req.headers)
+        res.redirect('/')
     } catch (error) {
-        console.log(error.message, error.stack);
+        console.log(error)
         res.redirect("/");
     }
 }
 
 module.exports.getShoppingCart = async (req,res) => {
     const cats = await Category.find({});
-    const cools = await Product.find({});
     let products;
     try {
         let cartUser;
         if(req.user){
             cartUser = await Cart.findOne({user:req.user._id});
-            console.log(cartUser);
         }
-        const cool = await Product.find({});
-        for(let p of cool){
         if(req.user && cartUser){
             req.session.cart = cartUser;
-            return res.render('categories/shoppingCart',{cools,pagename:`Glamoreux | Shopping Cart`,cart:cartUser,products: await productsFromCart(cartUser),product:p,cats,url:req.originalUrl});
+            return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:cartUser,products: await productsFromCart(cartUser),cats,url:req.originalUrl});
         }
         if(!req.session.cart){
-            return res.render('categories/shoppingCart',{cools,pagename:`Glamoreux | Shopping Cart`,cart:null,cats,products :null,url:req.originalUrl,product:p})
+            return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:null,cats,products :null,url:req.originalUrl})
         }
-        return res.render('categories/shoppingCart',{cools,pagename:`Glamoreux | Shopping Cart`,cart:req.session.cart,products: await productsFromCart(req.session.cart),product:p,url:req.originalUrl});
-    }} catch (error) {
-        console.log(error.message);
-        console.log(error.stack);
+        return res.render('categories/shoppingCart',{pagename:`Glamoreux | Shopping Cart`,cart:req.session.cart,products: await productsFromCart(req.session.cart),product:p,url:req.originalUrl});
+    } catch (error) {
+        console.log(error)
         res.redirect('/');
     }
 
@@ -83,9 +78,9 @@ module.exports.getShoppingCart = async (req,res) => {
 
 
 module.exports.reduce = async (req,res) => {
-    const {id} = req.params;
-    let cart;
     try {
+        const {id} = req.params;
+    let cart;
         if(req.user){
             cart = await Cart.findOne({user:req.user._id});
         }else if(req.session.cart){
@@ -112,7 +107,7 @@ module.exports.reduce = async (req,res) => {
             }
         }
         req.flash('success','Sucessfully removed cart');
-        res.redirect(req.headers.referer);
+        res.redirect('/shoppingCart');
     } catch (error) {
         console.log(error.message);
         res.redirect('/');
@@ -143,7 +138,7 @@ module.exports.removeAll = async (req,res) => {
             req.session.cart = null;
             await Cart.findByIdAndRemove(cart._id);
         }
-        res.redirect(req.headers.referer);
+        res.redirect('/shoppingCart');
     } catch (error) {
         console.log(error);
         res.redirect('/')
@@ -153,19 +148,31 @@ module.exports.removeAll = async (req,res) => {
 module.exports.checkout = async (req,res) => {
     const cats = await Category.find({});
     let cart;
-    const cool = await Product.find({});
-    for(let p of cool){
     if(!req.session.cart){
         res.redirect('/shoppingCart')
     }
     cart = await Cart.findById(req.session._id);
-    res.render('categories/checkout',{cats,cart,product:p,pagename:'Glamoreux | Checkout'})
-}}
+    res.render('categories/checkout',{cats,cart,pagename:'Glamoreux | Checkout'})
+}
 
-const  productsFromCart = async (cart) => {
+module.exports.postCheckout = async (req,res) => {
+    const form = _.pick(req.body,['amount','email','full_name']);
+    form.metadata = {
+        full_name : form.full_name
+    }
+    form.amount = 5000;
+    form.email = 'customer@email.com'
+    initializePayment(form, (error, body)=>{
+        if(error){
+         console.log(error)
+    }
+    console.log(body);
+})
+}
+
+const productsFromCart = async (cart) => {
     let products = []; 
     for (const item of cart.items) {
-        console.log(item.productId)
       let foundProduct = (
         await Product.findById(item.productId).populate("category")
       )
@@ -174,4 +181,4 @@ const  productsFromCart = async (cart) => {
      products.push(foundProduct)
     }
     return products;
-  }
+}

@@ -1,7 +1,6 @@
 const User = require('../models/user');
 const Token = require('../models/token');
-const nodemailer = require('nodemailer');
-const {google} = require('googleapis')
+const {sendMail} = require('../utils/email');
 
 module.exports.getAccounts = async (req,res) => {
     const users = await User.find({});
@@ -15,65 +14,27 @@ module.exports.renderRegister = (req,res) => {
 module.exports.register =  async (req,res,next) => {
     try{
         const {username , password , email} = req.body;
-          const user = await  new User({username, email});
-          const registeredUser = await User.register(user,password); 
+        const user = await  new User({username, email});
+        const registeredUser = await User.register(user,password); 
       req.login(registeredUser,err => {
-       if(err) return next(err);
-       const CLIENT_ID = process.env.CLIENT_ID;
-       const CLEINT_SECRET = process.env.CLEINT_SECRET;
-       const REDIRECT_URI = process.env.REDIRECT_URI;
-       const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
-    const oAuth2Client = new google.auth.OAuth2(
-      CLIENT_ID,
-      CLEINT_SECRET,
-      REDIRECT_URI
-    );
-    oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-    
-    async function sendMail() {
-      try {
-        const accessToken = await oAuth2Client.getAccessToken();
-    
-        const transport = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            type: 'OAuth2',
-            user: 'glamoreoux0@gmail.com',
-            clientId: CLIENT_ID,
-            clientSecret: CLEINT_SECRET,
-            refreshToken: REFRESH_TOKEN,
-            accessToken: accessToken,
-          },
-        });
-    
-        const mailOptions = {
-          from: 'Glamoreux <yours authorised email rajiolalekanh247@gmail.com>',
-          to: email,
-          subject: 'Welcome to Glamoreux',
-          text:'Jump right in and explore our many products. Feel free to share your reviews on our products',
-          html:'<h1>Jump right in and explore our many products. Feel free to share your reviews on our products</h1>',
-        }
-        const result = await transport.sendMail(mailOptions);
-        return result;
-      } catch (error) {
-        return error;
-      }
-    }
-      
-      sendMail()
-      .then((result) => console.log('Email sent...', result,))
-      .catch((error) => console.log(error.message));
-      req.flash('success','Welcome to hexashop');
+       if(err) return next(err)
+      })
+       req.flash('success','Welcome to hexashop');
       res.redirect('/')
-
-        })} catch (e){
+        await sendMail({
+          to,
+          subject,
+          text,
+          html,
+         })
+      } catch (e){
         req.flash('error', e.message)
          res.redirect('/');
       } 
- }
+}
 
 
- module.exports.renderLogin = (req,res) => {
+module.exports.renderLogin = (req,res) => {
     if (req.query.returnTo) {
         req.session.returnTo = req.query.returnTo;
     }
@@ -86,6 +47,9 @@ module.exports.login = (req,res) => {
     res.redirect(redirectUrl);      
 }
 
+module.exports.userProfile = (req,res) => {
+  res.render('users/profile')
+}
 
 module.exports.logout =  (req,res,next) => {
    req.logout(e => {

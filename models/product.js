@@ -29,10 +29,6 @@ module.exports = mongoose.model('Product',new Schema ({
         type:Number,
         required:true,
     },
-    admin:{
-        type: Schema.Types.ObjectId,
-        ref:'User'
-    },
     images : [
         ImageSchema
     ],
@@ -48,5 +44,3 @@ module.exports = mongoose.model('Product',new Schema ({
     ]
 
 }));
-
-

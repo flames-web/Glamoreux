@@ -1,6 +1,7 @@
 if(process.env.NODE_ENV !== 'production'){
   require('dotenv').config();
 }
+
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -11,19 +12,24 @@ const cookiePasser = require('cookie-parser')
 const passport = require('passport');
 const passportLocal = require('passport-local');
 const flash = require('connect-flash');
-const stripe = require('stripe')(process.env.SECRET_KEY);
 const methodOverride = require('method-override');
 const MongoStore = require('connect-mongo');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
+const https = require("https");
+const fs = require("fs");
 
-const Product = require('./models/product');
-const Category = require('./models/category');
+const options = {
+  key: fs.readFileSync("./config/cert.key"),
+  cert: fs.readFileSync("./config/cert.crt"),
+};
+
 const User = require('./models/user');
 
 const AppError = require('./utils/AppError');
 const catchAsync = require('./utils/catchAsync');
 
+const indexRoute = require('./routes/index');
 const productRoute = require('./routes/product');
 const adminRoute = require('./routes/admin');
 const usersRoute = require('./routes/users');
@@ -45,7 +51,7 @@ app.set('view engine','ejs')
 app.set('views',path.join(__dirname,'views'));
 
 const dbUrl = process.env.DB_URL;
-// const host = 'mongodb://localhost:27017/commerce'
+ 
 mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
@@ -77,9 +83,9 @@ app.use(session({
       expires: Date.now() * 1000 * 60*60*24*7,
       maxAge: 1000 * 60*60*24*7,
       httpOnly: true,
+      secure:true,
   }
 }))
-
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -107,13 +113,13 @@ const styleSrcUrls = [
     "https://ka-f.fontawesome.com"
 ];
 const connectSrcUrls = [
+  
+];
+const fontSrcUrls = [
   "https://fonts.gstatic.com",
   "https://cdn.linearicons.com",
 ];
-const fontSrcUrls = [
- 
-];
-app.use(
+app.use(                              
     helmet.contentSecurityPolicy({
         directives: {
             defaultSrc: [],
@@ -127,12 +133,7 @@ app.use(
                 "'self'",
                 "blob:",
                 "data:",
-                "https://res.cloudinary.com/dcz8fqwkr/", 
-                "https://images.unsplash.com",
-                "https://cdn.pixabay.com/",
-                "https://images.pexels.com",
-                "https://live.staticflickr.com",
-                "https://storage.needpix.com",
+                "https://res.cloudinary.com/dcz8fqwkr", 
             ],
             fontSrc: ["'self'", ...fontSrcUrls],
         },
@@ -148,53 +149,13 @@ res.locals.returnTo = req.originalUrl;
 next();
 });
 
-
-
-app.get('/', async (req,res) => {
-  const cats = await Category.find({}).populate('products');
-  const cools = await Product.find({});
-  const products = await Product.find({});
-  const images = ['/images/baner-right-image-01.jpg','/images/baner-right-image-02.jpg','/images/baner-right-image-03.jpg','/images/baner-right-image-04.jpg']
-  return res.render('home',{pagename:'Glamoreux',cats,url:req.originalUrl,images,products,cools})
-})
-
-
+app.use('/',indexRoute);
 app.use('/product',productRoute);
 app.use('/admin',adminRoute);
 app.use(usersRoute);
 app.use(cartRoute);
 app.use('/product/:id/reviews',reviewRoute);
 app.use('/',resetRoute);
-
-app.get("/search", async (req, res) => {
-  const cats = await Category.find({});
-  const cools = await Product.find({});
-  const perPage = 8;
-  let page = parseInt(req.query.page);
-  try {
-    const products = await Product.find(
-      {$or:[
-      {name: { $regex: req.query.search, $options: "i" }},
-      {description: { $regex: req.query.search, $options: "i" }}
-    ]})
-     .sort("-createdAt")
-      .skip(perPage * page - perPage)
-      .limit(perPage)
-      .populate("category")
-    const count = await Product.find(
-      {$or:[
-      {name: { $regex: req.query.search, $options: "i" }},
-      {description: { $regex: req.query.search, $options: "i" }}
-    ]})
-   
-      return  res.render('categories/product',{pagename:'Products',products,cools,cats,
-          pages: Math.ceil(count / perPage),home: `/product/?`,current: page,url:req.originalUrl})  
-
-  } catch (error) {
-    console.log(error.message,error.stack);
-    res.redirect("/");
-  }
-});
 
 app.all('*', (req,res,next) => {
   const error = new AppError(400,'Page Not Found');
@@ -211,3 +172,7 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Listening at port ${port}`);
 }) 
+
+https.createServer(options, app).listen(8080, () => {
+  console.log(`HTTPS server started on port 8080`);
+});

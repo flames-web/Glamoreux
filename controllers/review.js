@@ -14,7 +14,3 @@ module.exports.postReview = async (req,res) => {
     req.flash('success','Sucessfully created a new review');
     res.redirect(`/product/${product._id}`)
 }
-
-// module.exports.deleteReview = (req,res) => {
-//   res.redirect('/home')
-// }

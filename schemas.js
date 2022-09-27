@@ -41,4 +41,4 @@ module.exports.categorySchema = Joi.object({
 module.exports.reviewSchema = Joi.object({
     message:Joi.string().required().escapeHTML(),
     rating:Joi.number(),
-})
+}) 

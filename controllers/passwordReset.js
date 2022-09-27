@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const nodemailer = require('nodemailer');
 const {google} = require('googleapis');
+const {sendMail} = require('../utils/email');
 const Token = require('../models/token');
 const crypto = require('crypto');
 
@@ -24,53 +25,12 @@ module.exports.postReset = async (req,res) => {
           }).save();
       }
       const link = `${process.env.BASE_URL}/reset/${user._id}/${token.token}`;
-      console.log(link);
-  
-      const CLIENT_ID = process.env.CLIENT_ID;
-      const CLEINT_SECRET = process.env.CLEINT_SECRET;
-      const REDIRECT_URI = process.env.REDIRECT_URI;
-      const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
-      
-  const oAuth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLEINT_SECRET,
-  REDIRECT_URI
-  );
-  oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-  
-  async function sendMail() {
-  try {
-  const accessToken = await oAuth2Client.getAccessToken();
-  
-  const transport = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      type: 'OAuth2',
-      user: 'glamoreux0@gmail.com',
-      clientId: CLIENT_ID,
-      clientSecret: CLEINT_SECRET,
-      refreshToken: REFRESH_TOKEN,
-      accessToken: accessToken,
-    },
-  });
-  
-  const mailOptions = {
-    from: 'Glamoreux <yours authorised email glamoreux0@gmail.com>',
-    to: email,
-    subject: 'Password Reset',
-    text: link,
-    html: `<a href="${link}">${link}</a>`,
-  };
-  
-  const result = await transport.sendMail(mailOptions);
-  return result;
-  } catch (error) {
-  return error;
-  }
-  }
-  sendMail()
-  .then((result) => console.log('Email sent...', result,))
-  .catch((error) => console.log(error.message))
+      await sendMail({
+        to,
+        subject,
+        text,
+        html
+      })
   req.flash('success','email sent sucessfully')
   res.render('categories/email');
 }

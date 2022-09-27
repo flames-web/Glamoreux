@@ -14,4 +14,6 @@ router.get('/removeAll/:id',catchAsync(cart.removeAll))
 
 router.get('/checkout',catchAsync(cart.checkout))
 
+router.post('/checkout',catchAsync(cart.postCheckout))
+
 module.exports = router; 
