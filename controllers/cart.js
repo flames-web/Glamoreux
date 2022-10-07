@@ -148,14 +148,10 @@ module.exports.removeAll = async (req,res) => {
 module.exports.checkout = async (req,res) => {
     const cats = await Category.find({});
     let cart;
-    if(!req.session.cart){
-        res.redirect('/shoppingCart')
-    }
     cart = await Cart.findById(req.session._id);
-    res.render('categories/checkout',{cats,cart,pagename:'Glamoreux | Checkout'})
-}
-
-module.exports.postCheckout = async (req,res) => {
+    function getData(data){
+        return data
+    }
     const form = _.pick(req.body,['amount','email','full_name']);
     form.metadata = {
         full_name : form.full_name
@@ -166,8 +162,13 @@ module.exports.postCheckout = async (req,res) => {
         if(error){
          console.log(error)
     }
-    console.log(body);
+    console.log(getData(data));
 })
+    res.render('categories/checkout',{cats,cart,pagename:'Glamoreux | Checkout'})
+}
+
+module.exports.postCheckout = async (req,res) => {
+    
 }
 
 const productsFromCart = async (cart) => {
@@ -181,4 +182,4 @@ const productsFromCart = async (cart) => {
      products.push(foundProduct)
     }
     return products;
-}
+} 

@@ -16,13 +16,7 @@ const methodOverride = require('method-override');
 const MongoStore = require('connect-mongo');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
-const https = require("https");
-const fs = require("fs");
 
-const options = {
-  key: fs.readFileSync("./config/cert.key"),
-  cert: fs.readFileSync("./config/cert.crt"),
-};
 
 const User = require('./models/user');
 
@@ -50,7 +44,9 @@ app.use(mongoSanitize({
 app.set('view engine','ejs')
 app.set('views',path.join(__dirname,'views'));
 
-const dbUrl = process.env.DB_URL;
+const dbUrl =  process.env.DB_URL;
+// "mongodb+srv://olalekan:JVRaNVWelOc8R6BL@atlascluster.wihos6y.mongodb.net/commerce" 
+
  
 mongoose.connect(dbUrl);
 
@@ -83,7 +79,7 @@ app.use(session({
       expires: Date.now() * 1000 * 60*60*24*7,
       maxAge: 1000 * 60*60*24*7,
       httpOnly: true,
-      secure:true,
+      // secure:true,
   }
 }))
 
@@ -172,7 +168,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Listening at port ${port}`);
 }) 
-
-https.createServer(options, app).listen(8080, () => {
-  console.log(`HTTPS server started on port 8080`);
-});
