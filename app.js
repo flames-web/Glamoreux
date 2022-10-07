@@ -15,7 +15,7 @@ const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const MongoStore = require('connect-mongo');
 const mongoSanitize = require('express-mongo-sanitize');
-const helmet = require('helmet');
+// const helmet = require('helmet');
 
 
 const User = require('./models/user');
@@ -90,50 +90,50 @@ passport.use(new passportLocal(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use(helmet());
+// app.use(helmet());
 
-app.use(helmet.crossOriginEmbedderPolicy({ policy: "credentialless" }));
+// app.use(helmet.crossOriginEmbedderPolicy({ policy: "credentialless" }));
 
-const scriptSrcUrls = [
-    "https://stackpath.bootstrapcdn.com",
-    "https://kit-free.fontawesome.com",
-    "https://cdn.jsdelivr.net",
-    "https://kit.fontawesome.com",
-    "https://ka-f.fontawesome.com",
-];
-const styleSrcUrls = [
-    "https://kit-free.fontawesome.com",
-    "https://stackpath.bootstrapcdn.com",
-    "https://fonts.googleapis.com",
-    "https://cdn.jsdelivr.net",
-    "https://ka-f.fontawesome.com"
-];
-const connectSrcUrls = [
+// const scriptSrcUrls = [
+//     "https://stackpath.bootstrapcdn.com",
+//     "https://kit-free.fontawesome.com",
+//     "https://cdn.jsdelivr.net",
+//     "https://kit.fontawesome.com",
+//     "https://ka-f.fontawesome.com",
+// ];
+// const styleSrcUrls = [
+//     "https://kit-free.fontawesome.com",
+//     "https://stackpath.bootstrapcdn.com",
+//     "https://fonts.googleapis.com",
+//     "https://cdn.jsdelivr.net",
+//     "https://ka-f.fontawesome.com"
+// ];
+// const connectSrcUrls = [
   
-];
-const fontSrcUrls = [
-  "https://fonts.gstatic.com",
-  "https://cdn.linearicons.com",
-];
-app.use(                              
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: [],
-            connectSrc: ["'self'", ...connectSrcUrls],
-            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-            workerSrc: ["'self'", "blob:"],
-            childSrc: ["blob:"],
-            objectSrc: [],
-            imgSrc: [
-                "'self'",
-                "blob:",
-                "data:",
-                "https://res.cloudinary.com/dcz8fqwkr", 
-            ],
-            fontSrc: ["'self'", ...fontSrcUrls],
-        },
-    })),
+// ];
+// const fontSrcUrls = [
+//   "https://fonts.gstatic.com",
+//   "https://cdn.linearicons.com",
+// ];
+// app.use(                              
+//     helmet.contentSecurityPolicy({
+//         directives: {
+//             defaultSrc: [],
+//             connectSrc: ["'self'", ...connectSrcUrls],
+//             scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+//             styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+//             workerSrc: ["'self'", "blob:"],
+//             childSrc: ["blob:"],
+//             objectSrc: [],
+//             imgSrc: [
+//                 "'self'",
+//                 "blob:",
+//                 "data:",
+//                 "https://res.cloudinary.com/dcz8fqwkr", 
+//             ],
+//             fontSrc: ["'self'", ...fontSrcUrls],
+//         },
+//     })),
 
 app.use(flash());
 app.use((req,res,next) => {
